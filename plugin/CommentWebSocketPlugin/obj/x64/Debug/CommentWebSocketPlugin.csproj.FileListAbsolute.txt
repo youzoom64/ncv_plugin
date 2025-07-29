@@ -1,0 +1,9 @@
+F:\project_root\app_workspaces\niconico\plugin\CommentWebSocketPlugin\bin\x64\Debug\CommentWebSocketPlugin.dll
+F:\project_root\app_workspaces\niconico\plugin\CommentWebSocketPlugin\bin\x64\Debug\CommentWebSocketPlugin.pdb
+F:\project_root\app_workspaces\niconico\plugin\CommentWebSocketPlugin\bin\x64\Debug\NicoLibrary.dll
+F:\project_root\app_workspaces\niconico\plugin\CommentWebSocketPlugin\bin\x64\Debug\Plugin.dll
+F:\project_root\app_workspaces\niconico\plugin\CommentWebSocketPlugin\obj\x64\Debug\CommentWebSocketPlugin.csproj.AssemblyReference.cache
+F:\project_root\app_workspaces\niconico\plugin\CommentWebSocketPlugin\obj\x64\Debug\CommentWebSocketPlugin.csproj.CoreCompileInputs.cache
+F:\project_root\app_workspaces\niconico\plugin\CommentWebSocketPlugin\obj\x64\Debug\CommentW.EC2293FB.Up2Date
+F:\project_root\app_workspaces\niconico\plugin\CommentWebSocketPlugin\obj\x64\Debug\CommentWebSocketPlugin.dll
+F:\project_root\app_workspaces\niconico\plugin\CommentWebSocketPlugin\obj\x64\Debug\CommentWebSocketPlugin.pdb

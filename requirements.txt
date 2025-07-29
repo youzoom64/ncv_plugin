@@ -1,0 +1,4 @@
+websockets==12.0
+requests==2.31.0
+pygame==2.5.2
+asyncio

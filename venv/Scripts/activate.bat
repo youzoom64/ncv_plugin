@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=F:\project_root\app_workspaces\niconico\venv
+set VIRTUAL_ENV=C:\project_root\app_workspaces\niconico\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

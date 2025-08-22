@@ -1,0 +1,9 @@
+{
+  "replacements": {
+    "www": "ワラワラワラ",
+    "草": "くさ"
+  },
+  "skip_long_numbers": true,
+  "number_limit": 6,
+  "skip_urls": true
+}

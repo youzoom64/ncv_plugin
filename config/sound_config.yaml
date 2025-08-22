@@ -1,0 +1,82 @@
+# サウンド設定ファイル
+sound_settings:
+  # コマンド別サウンド設定
+  commands:
+    info:
+      type: "generated"  # generated | file | url
+      sound_type: "beep"
+      frequency: 800
+      duration: 0.3
+      volume: 0.3
+      description: "インフォメーション音（ピコーン）"
+    
+    gift:
+      type: "generated"
+      sound_type: "chime"
+      frequencies: [1000, 1200, 1500]
+      duration: 0.5
+      volume: 0.2
+      description: "ギフト音（キラキラ）"
+    
+    ad:
+      type: "generated"
+      sound_type: "low_beep"
+      frequency: 400
+      duration: 0.4
+      volume: 0.3
+      description: "広告音（低音ビープ）"
+    
+    disconnect:
+      type: "generated"
+      sound_type: "descending"
+      start_frequency: 600
+      end_frequency: 200
+      duration: 0.6
+      volume: 0.3
+      description: "切断音（下降音）"
+    
+    connect:
+      type: "generated"
+      sound_type: "ascending"
+      start_frequency: 400
+      end_frequency: 800
+      duration: 0.5
+      volume: 0.3
+      description: "接続音（上昇音）"
+    
+    # ファイルから読み込む例
+    premium:
+      type: "file"
+      file_path: "sounds/premium.wav"
+      volume: 0.4
+      description: "プレミアム会員音"
+    
+    # URLから取得する例（将来の拡張用）
+    special:
+      type: "url"
+      url: "https://example.com/sounds/special.wav"
+      volume: 0.3
+      description: "特別音"
+    
+    # デフォルト音
+    default:
+      type: "generated"
+      sound_type: "beep"
+      frequency: 600
+      duration: 0.2
+      volume: 0.2
+      description: "デフォルト音"
+
+# グローバル設定
+global_settings:
+  master_volume: 1.0
+  cache_sounds: true
+  cache_directory: "sounds/cache/"
+  max_cache_size_mb: 50
+  
+# 音声生成設定
+generation_settings:
+  sample_rate: 24000
+  bit_depth: 16
+  channels: 2
+  buffer_size: 512

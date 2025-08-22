@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "F:\\project_root\\app_workspaces\\niconico\\plugin\\CommentWebSocketPlugin\\",
+  "WorkspaceRootPath": "C:\\project_root\\app_workspaces\\niconico\\plugin\\CommentWebSocketPlugin\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{51030B7C-D5C4-4ECB-A60D-FB3F01C645F9}|CommentWebSocketPlugin.csproj|f:\\project_root\\app_workspaces\\niconico\\plugin\\commentwebsocketplugin\\commentwebsocketplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{51030B7C-D5C4-4ECB-A60D-FB3F01C645F9}|CommentWebSocketPlugin.csproj|c:\\project_root\\app_workspaces\\niconico\\plugin\\commentwebsocketplugin\\commentwebsocketplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{51030B7C-D5C4-4ECB-A60D-FB3F01C645F9}|CommentWebSocketPlugin.csproj|solutionrelative:commentwebsocketplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -20,18 +20,14 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "CommentWebSocketPlugin.cs",
-              "DocumentMoniker": "F:\\project_root\\app_workspaces\\niconico\\plugin\\CommentWebSocketPlugin\\CommentWebSocketPlugin.cs",
+              "DocumentMoniker": "C:\\project_root\\app_workspaces\\niconico\\plugin\\CommentWebSocketPlugin\\CommentWebSocketPlugin.cs",
               "RelativeDocumentMoniker": "CommentWebSocketPlugin.cs",
-              "ToolTip": "F:\\project_root\\app_workspaces\\niconico\\plugin\\CommentWebSocketPlugin\\CommentWebSocketPlugin.cs*",
-              "RelativeToolTip": "CommentWebSocketPlugin.cs*",
-              "ViewState": "AgIAAMcAAAAAAAAAAAAkwOgAAAAFAAAAAAAAAA==",
+              "ToolTip": "C:\\project_root\\app_workspaces\\niconico\\plugin\\CommentWebSocketPlugin\\CommentWebSocketPlugin.cs",
+              "RelativeToolTip": "CommentWebSocketPlugin.cs",
+              "ViewState": "AgIAAJAAAAAAAAAAAAAlwLAAAABNAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-28T22:09:54.144Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
             }
           ]
         }

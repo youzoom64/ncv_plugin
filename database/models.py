@@ -10,6 +10,7 @@ class UserSettings:
     voice_id: Optional[int] = None
     skin_id: Optional[int] = None
     font_id: Optional[int] = None
+    sound_id: Optional[int] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 
@@ -28,10 +29,18 @@ class UserSettingsDB:
                     voice_id INTEGER,
                     skin_id INTEGER,
                     font_id INTEGER,
+                    sound_id INTEGER,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+            
+            # sound_idカラムが存在しない場合は追加（既存DB対応）
+            try:
+                conn.execute("ALTER TABLE user_settings ADD COLUMN sound_id INTEGER")
+                print("[DB] sound_idカラムを追加しました")
+            except sqlite3.OperationalError:
+                pass  # カラムが既に存在する場合
             
             # 更新日時を自動更新するトリガー
             conn.execute("""
@@ -59,15 +68,15 @@ class UserSettingsDB:
     
     def save_user_settings(self, user_id: str, name: str = None, 
                           voice_id: int = None, skin_id: int = None, 
-                          font_id: int = None) -> bool:
+                          font_id: int = None, sound_id: int = None) -> bool:
         """ユーザー設定保存・更新"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 conn.execute("""
                     INSERT OR REPLACE INTO user_settings 
-                    (user_id, name, voice_id, skin_id, font_id, updated_at)
-                    VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-                """, (user_id, name, voice_id, skin_id, font_id))
+                    (user_id, name, voice_id, skin_id, font_id, sound_id, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                """, (user_id, name, voice_id, skin_id, font_id, sound_id))
                 return True
         except Exception as e:
             print(f"[DB ERROR] 設定保存失敗: {e}")

@@ -166,7 +166,7 @@ public class CommentWebSocketPlugin : IPlugin
         try
         {
             var process = new Process();
-            process.StartInfo.FileName = @"F:\project_root\app_workspaces\niconico\start_voice_system.bat";
+            process.StartInfo.FileName = @"C:\project_root\app_workspaces\niconico\start_voice_system.bat";
             process.StartInfo.CreateNoWindow = false;
             process.StartInfo.UseShellExecute = true;
             process.Start();

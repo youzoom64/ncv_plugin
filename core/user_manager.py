@@ -22,6 +22,8 @@ class UserManager:
                 result["skin"] = settings.skin_id
             if settings.font_id is not None:
                 result["font"] = settings.font_id
+            if hasattr(settings, 'sound_id') and settings.sound_id is not None:
+                result["sound"] = settings.sound_id
             
             print(f"[DB] 🔍 保存済み設定使用: {user_id}")
             if settings.name:
@@ -34,18 +36,20 @@ class UserManager:
             return default
 
     def save_user_settings(self, user_id: str, name: str = None, 
-                          skin: int = None, font: int = None, voice: int = None):
-        """ユーザー設定保存（名前も含む）"""
+                          skin: int = None, font: int = None, voice: int = None,
+                          sound: int = None):
+        """ユーザー設定保存（soundパラメータ追加）"""
         if not user_id or user_id == "":
             print("[DB] ⚠️  無効なユーザーID: 保存スキップ")
-            return
+            return False
             
         success = self.db.save_user_settings(
             user_id=user_id,
             name=name,
             voice_id=voice,
             skin_id=skin,
-            font_id=font
+            font_id=font,
+            sound_id=sound
         )
         
         if success:
@@ -58,8 +62,12 @@ class UserManager:
                 print(f"     スキンID: {skin}")
             if font:
                 print(f"     フォントID: {font}")
+            if sound:
+                print(f"     サウンドID: {sound}")
         else:
             print(f"[DB] ❌ 設定保存失敗: {user_id}")
+        
+        return success
     
     def get_user_stats(self) -> Dict[str, Any]:
         """ユーザー統計情報"""

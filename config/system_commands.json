@@ -1,0 +1,7 @@
+{
+  "sound_enabled": true,
+  "operator_voice_id": 102,
+  "sound_files": {
+    "info 10": "C:/project_root/app_workspaces/NCV/sounds/doarbell.wav"
+  }
+}

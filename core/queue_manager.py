@@ -55,7 +55,7 @@ class QueueManager:
         print("[SYNTHESIS] 音声合成ワーカー開始")
         while self.running:
             try:
-                item = self.text_queue.get(timeout=5)
+                item = self.text_queue.get(timeout=0.1)
                 if item is None:  # 終了シグナル
                     break
                     
@@ -91,7 +91,7 @@ class QueueManager:
         print("[PLAYBACK] 音声再生ワーカー開始")
         while self.running:
             try:
-                item = self.audio_queue.get(timeout=5)
+                item = self.audio_queue.get(timeout=0.1)
                 if item is None:  # 終了シグナル
                     break
                     

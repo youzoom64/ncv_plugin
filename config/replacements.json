@@ -1,7 +1,8 @@
 {
   "replacements": {
     "www": "ワラワラワラ",
-    "草": "くさ"
+    "草": "くさ",
+    "888": "パチパチパチ"
   },
   "skip_long_numbers": true,
   "number_limit": 6,

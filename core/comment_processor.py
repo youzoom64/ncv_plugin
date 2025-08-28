@@ -4,6 +4,7 @@ from core.settings_manager import SettingsManager
 from core.queue_manager import QueueManager
 from core.sound_controller import SoundController
 from core.text_converter import TextConverter
+import shlex
 import numpy as np
 import time
 import json
@@ -239,19 +240,22 @@ class CommentProcessor:
         
         # コマンド部分を除去した文章を抽出
         clean_text = full_text[len(f"/{command_type}"):].strip()
+
+        # コマンド別テンプレ整形（設定テンプレを優先）
+        formatted_text = self._format_system_tts(command_type, clean_text, settings)
         
         if settings.get("sound_enabled", True):
-            if clean_text and len(clean_text) > 1:
+            if formatted_text and len(formatted_text) > 1:
                 # 効果音+音声を合成してキューに追加
-                self._queue_combined_audio(command_type, clean_text, settings, user_id)
+                self._queue_combined_audio(command_type, formatted_text, settings, user_id)
             else:
                 # 効果音のみをキューに追加
                 self._queue_sound_only(command_type, settings)
         else:
             # 音声のみをキューに追加
-            if clean_text and len(clean_text) > 1:
+            if formatted_text and len(formatted_text) > 1:
                 voice_id = self._get_user_voice_id(user_id)
-                self.queue_manager.add_to_synthesis_queue(clean_text, voice_id)
+                self.queue_manager.add_to_synthesis_queue(formatted_text, voice_id)
         
         return True
 
@@ -285,18 +289,21 @@ class CommentProcessor:
     def _get_sound_data(self, command_type: str, settings: dict) -> Optional[bytes]:
         """効果音データを取得"""
         sound_files = settings.get("sound_files", {})
+        # エイリアス（例: nicoad -> ad）
+        alias_map = settings.get("sound_alias", {})
+        resolved_command = alias_map.get(command_type, command_type)
         
-        if command_type in sound_files:
+        if resolved_command in sound_files:
             # カスタムファイル
             try:
-                with open(sound_files[command_type], 'rb') as f:
+                with open(sound_files[resolved_command], 'rb') as f:
                     return f.read()
             except Exception as e:
                 print(f"[SOUND ERROR] ファイル読み込みエラー: {e}")
                 return None
         else:
             # デフォルト効果音
-            return self.sound_controller.get_command_sound(command_type)
+            return self.sound_controller.get_command_sound(resolved_command)
 
     def _play_sound_immediately(self, sound_data: bytes):
         """効果音を即座に再生（非ブロッキング）"""
@@ -337,6 +344,102 @@ class CommentProcessor:
                 return json.load(f)
         except:
             return {"sound_enabled": True, "sound_files": {}}
+
+    def _format_system_tts(self, command_type: str, clean_text: str, settings: dict) -> str:
+        """コマンド別に読み上げ文を整形（テンプレ適用）"""
+        try:
+            templates = settings.get("templates", {})
+            if command_type == "gift":
+                # /gift nicolive_audition_orange 126050768 "ゲスト" 15 "" "応援 メガホン オレンジ "
+                # 想定: parts = [service, id, name, point, empty, gift with spaces]
+                display_name = None
+                gift_name = None
+                point = None
+                try:
+                    parts = shlex.split(clean_text)
+                except Exception:
+                    parts = []
+                # shlex.split は引用符を除去する
+                if parts:
+                    # name
+                    if len(parts) >= 3 and parts[2]:
+                        display_name = parts[2].strip()
+                    # point (数字)
+                    if len(parts) >= 4 and re.fullmatch(r"\d+", parts[3] or ""):
+                        point = parts[3]
+                    # gift 名（最後のトークンを優先）
+                    if len(parts) >= 6 and parts[5]:
+                        gift_name = parts[5]
+                # 補助: 引用抽出
+                if display_name is None or gift_name is None or point is None:
+                    dq = re.findall(r'"([^"]+)"', clean_text)
+                    if display_name is None and dq:
+                        display_name = dq[0].strip()
+                    if gift_name is None and len(dq) >= 2:
+                        gift_name = dq[-1].strip()
+                    if point is None:
+                        mpt = re.search(r'\s(\d{1,6})(?:\s|\"|$)', clean_text)
+                        if mpt:
+                            point = mpt.group(1)
+                # フォールバック
+                if not display_name:
+                    display_name = "ゲスト"
+                if not gift_name:
+                    # 日本語スペースや全角空白を統一
+                    normalized = re.sub(r"\s+", " ", clean_text).strip()
+                    tokens = normalized.split(" ")
+                    if tokens:
+                        gift_name = tokens[-1].strip('"')
+                if not point:
+                    point = ""
+                # 見栄え調整: ギフト名の空白除去
+                gift_name = re.sub(r"\s+", "", gift_name)
+                template = templates.get("gift", "{name}さんが{point}ポイント{gift}をギフトしました")
+                return template.format(name=display_name, point=point, gift=gift_name)
+            elif command_type == "nicoad":
+                # /nicoad {json}
+                total = None
+                name = None
+                point = None
+                # JSON部分を抽出
+                json_str_match = re.search(r'(\{.*\})', clean_text)
+                if json_str_match:
+                    json_str = json_str_match.group(1)
+                    try:
+                        obj = json.loads(json_str)
+                        total = obj.get("totalAdPoint")
+                        message = obj.get("message", "")
+                        # メッセージから「◯◯さんがNNNpt」抽出
+                        msg = re.sub(r'【[^】]*】', '', message)
+                        m = re.search(r'(.+?)さんが\s*(\d+)\s*pt', msg)
+                        if m:
+                            name = m.group(1).strip()
+                            point = m.group(2)
+                    except Exception as e:
+                        print(f"[PARSER] nicoad JSON解析エラー: {e}")
+                if not name:
+                    name = "ゲスト"
+                if not point:
+                    # メッセージ中の数値を最後の候補として
+                    m2 = re.search(r'(\d+)\s*pt', clean_text)
+                    if m2:
+                        point = m2.group(1)
+                if not total:
+                    # 合計値フォールバック
+                    m3 = re.search(r'"totalAdPoint"\s*:\s*(\d+)', clean_text)
+                    if m3:
+                        total = int(m3.group(1))
+                template = templates.get("nicoad", "合計{total}ポイント　{name}さんが{point}ポイント広告しました")
+                try:
+                    return template.format(total=total if total is not None else 0, name=name, point=point if point is not None else 0)
+                except Exception:
+                    return f"合計{total if total is not None else 0}ポイント　{name}さんが{point if point is not None else 0}ポイント広告しました"
+            else:
+                # その他のコマンドは本文をそのまま（ただし技術的トークンをなるべく省く場合はここで拡張）
+                return clean_text
+        except Exception as e:
+            print(f"[FORMAT ERROR] /{command_type}: {e}")
+            return clean_text
 
     def _handle_normal_comment(self, user_id: str, mail: str, parsed: Dict[str, Any]) -> bool:
         """通常コメントを処理"""

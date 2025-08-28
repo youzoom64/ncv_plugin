@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ニコ生コメント表示</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Hachi+Maru+Pop&family=Klee+One&family=RocknRoll+One&family=New+Tegomin&family=Train+One&family=DotGothic16&family=Reggae+One&family=Yuji+Syuku&family=Yuji+Boku&family=Mochiy+Pop+One&family=Kaisei+HarunoUmi&family=Shippori+Antique&family=Stick&family=Rampart+One&family=Zen+Antique&family=Mochiy+Pop+P+One&family=Zen+Kurenaido&family=Yusei+Magic&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            overflow: hidden;
+            font-family: 'DotGothic16', sans-serif;
+        }
+        
+        #comment-container {
+            position: relative;
+            width: 512px;
+            height: 100vh;
+            margin: 0 auto;
+        }
+        
+        .comment-item {
+            position: absolute;
+            width: 512px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease-out;
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        
+        .comment-item.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .comment-item.moving-up {
+            transition: all 0.2s ease-out;
+        }
+        
+        .comment-text {
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 480px;
+        }
+        
+        /* フォント定義 */
+        .font-0 { font-family: 'DotGothic16', sans-serif; } /* デフォルト */
+        .font-1 { font-family: 'Dela Gothic One', cursive; }
+        .font-2 { font-family: 'Hachi Maru Pop', cursive; }
+        .font-3 { font-family: 'Klee One', cursive; }
+        .font-4 { font-family: 'RocknRoll One', cursive; }
+        .font-5 { font-family: 'New Tegomin', serif; }
+        .font-6 { font-family: 'Train One', cursive; }
+        .font-7 { font-family: 'DotGothic16', sans-serif; }
+        .font-8 { font-family: 'Reggae One', cursive; }
+        .font-9 { font-family: 'Yuji Syuku', serif; }
+        .font-10 { font-family: 'Yuji Boku', serif; }
+        .font-11 { font-family: 'Mochiy Pop One', sans-serif; }
+        .font-12 { font-family: 'Kaisei HarunoUmi', serif; }
+        .font-13 { font-family: 'Shippori Antique', serif; }
+        .font-14 { font-family: 'Stick', sans-serif; }
+        .font-15 { font-family: 'Rampart One', cursive; }
+        .font-16 { font-family: 'Zen Antique', serif; }
+        .font-17 { font-family: 'Mochiy Pop P One', sans-serif; }
+        .font-18 { font-family: 'Zen Kurenaido', sans-serif; }
+        .font-19 { font-family: 'Yusei Magic', sans-serif; }
+        
+        /* スキン背景 */
+        .skin-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        /* アニメーション用キーフレーム */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(-32px);
+            }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.2s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div id="comment-container">
+        <!-- コメントがここに動的に追加される -->
+    </div>
+    
+    <script src="comment_display.js"></script>
+</body>
+</html>

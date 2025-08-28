@@ -12,6 +12,7 @@ from core.sound_controller import SoundController
 from core.queue_manager import QueueManager
 from core.settings_manager import SettingsManager
 from core.comment_processor import CommentProcessor
+from gui.comment_websocket_server import get_comment_server
 
 class WebSocketHandler:
     def __init__(self):

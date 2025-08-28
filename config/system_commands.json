@@ -1,7 +1,15 @@
 {
   "sound_enabled": true,
   "operator_voice_id": 102,
+  "sound_alias": {
+    "nicoad": "ad"
+  },
   "sound_files": {
-    "info 10": "C:/project_root/app_workspaces/NCV/sounds/doarbell.wav"
+    "gift": "Sound/gift.wav",
+    "ad": "Sound/koukoku.wav"
+  },
+  "templates": {
+    "gift": "{name}さんが{point}ポイント{gift}をギフトしました",
+    "nicoad": "合計{total}ポイント。{name}さんが{point}ポイント広告しました"
   }
 }

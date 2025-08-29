@@ -61,7 +61,9 @@
 
       .comment-text {
         color: #ffffff;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        text-shadow: -1px -1px 0 #000, /* 左上 */ 1px -1px 0 #000,
+          /* 右上 */ -1px 1px 0 #000, /* 左下 */ 1px 1px 0 #000,
+          /* 右下 */ 2px 2px 4px rgba(0, 0, 0, 0.8); /* ぼかし影 */
         font-weight: bold;
         text-align: left;
         white-space: nowrap;
@@ -71,6 +73,14 @@
         flex: 1;
         position: relative;
         z-index: 2;
+      }
+
+      /* 運営コメント専用スタイル */
+      .comment-text.operator {
+        color: #ffff00;
+        text-shadow: 2px 2px 4px rgba(255, 0, 0, 0.8);
+        font-weight: bold;
+        font-size: 18px;
       }
 
       /* フォント定義（フォールバック付き） */
@@ -132,6 +142,80 @@
         font-family: "Zen Kurenaido", "MS Gothic", sans-serif;
       }
       .font-19 {
+        font-family: "Yusei Magic", "MS Gothic", sans-serif;
+      }
+
+      /* フォントプレビュー用のスタイル（提供されたCSSと同じ） */
+      .font-preview {
+        margin-top: 10px;
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+        border: 2px solid #dee2e6;
+        font-size: 1.3em;
+        color: #2c3e50;
+        text-align: center;
+      }
+
+      /* フォントプレビュー用の各フォントクラス */
+      .font-preview.font-0 {
+        font-family: "DotGothic16", "MS Gothic", monospace, sans-serif;
+      }
+      .font-preview.font-1 {
+        font-family: "Dela Gothic One", "MS Gothic", cursive, sans-serif;
+      }
+      .font-preview.font-2 {
+        font-family: "Hachi Maru Pop", "MS Gothic", cursive, sans-serif;
+      }
+      .font-preview.font-3 {
+        font-family: "Klee One", "MS Mincho", cursive, serif;
+      }
+      .font-preview.font-4 {
+        font-family: "RocknRoll One", "MS Gothic", cursive, sans-serif;
+      }
+      .font-preview.font-5 {
+        font-family: "New Tegomin", "MS Mincho", serif, sans-serif;
+      }
+      .font-preview.font-6 {
+        font-family: "Train One", "MS Gothic", cursive, sans-serif;
+      }
+      .font-preview.font-7 {
+        font-family: "DotGothic16", "MS Gothic", monospace, sans-serif;
+      }
+      .font-preview.font-8 {
+        font-family: "Reggae One", "MS Gothic", cursive, sans-serif;
+      }
+      .font-preview.font-9 {
+        font-family: "Yuji Syuku", "MS Mincho", serif, sans-serif;
+      }
+      .font-preview.font-10 {
+        font-family: "Yuji Boku", "MS Mincho", serif, sans-serif;
+      }
+      .font-preview.font-11 {
+        font-family: "Mochiy Pop One", "MS Gothic", sans-serif;
+      }
+      .font-preview.font-12 {
+        font-family: "Kaisei HarunoUmi", "MS Mincho", serif, sans-serif;
+      }
+      .font-preview.font-13 {
+        font-family: "Shippori Antique", "MS Mincho", serif, sans-serif;
+      }
+      .font-preview.font-14 {
+        font-family: "Stick", "MS Gothic", sans-serif;
+      }
+      .font-preview.font-15 {
+        font-family: "Rampart One", "MS Gothic", cursive, sans-serif;
+      }
+      .font-preview.font-16 {
+        font-family: "Zen Antique", "MS Mincho", serif, sans-serif;
+      }
+      .font-preview.font-17 {
+        font-family: "Mochiy Pop P One", "MS Gothic", sans-serif;
+      }
+      .font-preview.font-18 {
+        font-family: "Zen Kurenaido", "MS Gothic", sans-serif;
+      }
+      .font-preview.font-19 {
         font-family: "Yusei Magic", "MS Gothic", sans-serif;
       }
 
@@ -304,47 +388,65 @@
           commentElement.id = `comment-${comment.id}`;
           commentElement.style.bottom = "0px";
 
-                  // スキン背景設定
-        console.log(`🎨 スキン処理開始 - comment.skin: ${comment.skin} (型: ${typeof comment.skin})`);
-        
-        let skinPath;
-        if (comment.skin && comment.skin !== null && comment.skin !== "null") {
-          skinPath = `/skin/${comment.skin}.png`;
-          console.log(`🖼️ カスタムスキン使用: ${skinPath}`);
-        } else {
-          skinPath = `/skin/6.png`;
-          console.log(`🖼️ デフォルトスキン使用: ${skinPath}`);
-        }
+          // スキン背景設定
+          console.log(
+            `🎨 スキン処理開始 - comment.skin: ${
+              comment.skin
+            } (型: ${typeof comment.skin})`
+          );
 
-        const skinBg = document.createElement("div");
-        skinBg.className = "skin-bg";
-        skinBg.style.backgroundImage = `url('${skinPath}')`;
-        skinBg.style.border = "2px solid red"; // デバッグ用：スキン領域を可視化
-        
-        console.log(`🎯 スキン要素作成完了 - backgroundImage: ${skinBg.style.backgroundImage}`);
+          let skinPath;
+          if (
+            comment.skin &&
+            comment.skin !== null &&
+            comment.skin !== "null"
+          ) {
+            skinPath = `http://localhost:8080/skin/${comment.skin}.png`;
+            console.log(`🖼️ カスタムスキン使用: ${skinPath}`);
+          } else {
+            skinPath = `http://localhost:8080/skin/6.png`;
+            console.log(`🖼️ デフォルトスキン使用: ${skinPath}`);
+          }
 
-        // スキン読み込み確認
-        const testImg = new Image();
-        testImg.onload = () => {
-          console.log(`✅ スキン読み込み成功: ${skinPath}`);
-          // デバッグ用の枠線を削除
-          skinBg.style.border = "none";
-        };
-        testImg.onerror = () => {
-          console.error(`❌ スキン読み込み失敗: ${skinPath}`);
-          // フォールバックスキンを試行
-          skinBg.style.backgroundImage = `url('/skin/6.png')`;
-          skinBg.style.border = "2px solid yellow"; // フォールバック時は黄色
-        };
-        testImg.src = skinPath;
+          const skinBg = document.createElement("div");
+          skinBg.className = "skin-bg";
+          skinBg.style.backgroundImage = `url('${skinPath}')`;
+          skinBg.style.border = "2px solid red"; // デバッグ用：スキン領域を可視化
 
-        commentElement.appendChild(skinBg);
-        console.log(`📦 スキン要素をコメントに追加完了`);
+          console.log(
+            `🎯 スキン要素作成完了 - backgroundImage: ${skinBg.style.backgroundImage}`
+          );
+
+          // スキン読み込み確認
+          const testImg = new Image();
+          testImg.onload = () => {
+            console.log(`✅ スキン読み込み成功: ${skinPath}`);
+            // デバッグ用の枠線を削除
+            skinBg.style.border = "none";
+          };
+          testImg.onerror = () => {
+            console.error(`❌ スキン読み込み失敗: ${skinPath}`);
+            // フォールバックスキンを試行
+            skinBg.style.backgroundImage = `url('http://localhost:8080/skin/6.png')`;
+            skinBg.style.border = "2px solid yellow"; // フォールバック時は黄色
+          };
+          testImg.src = skinPath;
+
+          commentElement.appendChild(skinBg);
+          console.log(`📦 スキン要素をコメントに追加完了`);
 
           // コメントテキスト
           const fontClass = `font-${comment.font || 0}`;
           const textElement = document.createElement("div");
-          textElement.className = `comment-text ${fontClass}`;
+
+          // 運営コメントの場合は特別なスタイルを適用
+          if (comment.is_operator || comment.text.startsWith("[運営]")) {
+            textElement.className = `comment-text operator ${fontClass}`;
+            console.log("🎖️ 運営コメントスタイル適用");
+          } else {
+            textElement.className = `comment-text ${fontClass}`;
+          }
+
           textElement.textContent = comment.text;
           console.log(`フォントクラス適用: ${fontClass}`);
 

@@ -258,6 +258,9 @@ class CommentProcessor:
                 voice_id = self._get_user_voice_id(user_id)
                 self.queue_manager.add_to_synthesis_queue(formatted_text, voice_id)
         
+        # 運営コメントもコメント表示用WebSocketに送信
+        self._send_operator_comment_to_display(formatted_text, command_type, user_id)
+        
         return True
 
     def _queue_combined_audio(self, command_type: str, text: str, settings: dict, user_id: str):
@@ -505,6 +508,28 @@ class CommentProcessor:
             print(f"[DISPLAY ERROR] コメント表示送信エラー: {e}")
         
         return True
+    
+    def _send_operator_comment_to_display(self, formatted_text: str, command_type: str, user_id: str):
+        """運営コメントをコメント表示用WebSocketに送信"""
+        try:
+            from gui.comment_websocket_server import get_comment_server
+            comment_server = get_comment_server()
+            if comment_server:
+                # 運営コメント用のデータ
+                comment_data = {
+                    "text": f"[運営] {formatted_text}",  # 運営プレフィックスを追加
+                    "user_id": user_id,
+                    "skin": 10,  # 運営専用スキン（例：10.png）
+                    "font": 1,   # 運営専用フォント（例：太字フォント）
+                    "timestamp": time.time(),
+                    "is_operator": True  # 運営フラグ
+                }
+                asyncio.create_task(comment_server.send_comment(comment_data))
+                print(f"[DISPLAY] ✅ 運営コメント表示用WebSocketに送信完了: {formatted_text}")
+            else:
+                print(f"[DISPLAY] ❌ コメント表示用WebSocketサーバーが利用できません")
+        except Exception as e:
+            print(f"[DISPLAY ERROR] 運営コメント表示送信エラー: {e}")
         
     def _auto_save_user_info(self, user_id: str):
         """生IDの場合、ユーザー情報を自動取得・保存"""

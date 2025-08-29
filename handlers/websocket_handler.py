@@ -30,16 +30,33 @@ class WebSocketHandler:
             self.sound_controller
         )
         
+        # コメント表示WebSocketサーバー
+        self.comment_server = get_comment_server()
+        
         # 送信用キュー
         self.send_queue = queue.Queue()
         
         print("🎤 音声合成システム開始")
         print("🔊 サウンドシステム開始")
+        print("🖥️ コメント表示システム開始")
     
     async def connect_and_run(self, uri: str = "ws://localhost:8765"):
         """WebSocketサーバーに接続して実行"""
         # ワーカー開始
         self.queue_manager.start_workers(self.voice_controller)
+        
+        # コメント表示用WebSocketサーバーを起動
+        print("🔌 コメント表示用WebSocketサーバーを起動中...")
+        try:
+            # コメント表示用WebSocketサーバーを非同期で起動
+            server_task = asyncio.create_task(self.comment_server.start_server())
+            print("✅ コメント表示用WebSocketサーバー起動完了")
+            
+            # サーバーが起動するまで少し待機
+            await asyncio.sleep(2)
+            
+        except Exception as e:
+            print(f"[ERROR] コメント表示用WebSocketサーバー起動エラー: {e}")
         
         print("🔌 WebSocketサーバー接続中...")
         
@@ -100,6 +117,44 @@ class WebSocketHandler:
             
             # コメント処理
             success = self.comment_processor.process_comment(data)
+            
+            # コメント表示用WebSocketで送信
+            if "comment" in data:
+                comment_text = data.get("comment", "")
+                user_id = data.get("user_id", "")
+                print(f"[DISPLAY] コメント表示用WebSocketに送信: {comment_text}")
+                try:
+                    # コメント表示用WebSocketサーバーに送信
+                    if self.comment_server:
+                        # 非同期で送信
+                        asyncio.create_task(self.comment_server.send_comment({
+                            "text": comment_text,
+                            "user_id": user_id,
+                            "timestamp": time.time()
+                        }))
+                        print(f"[DISPLAY] ✅ コメント表示用WebSocketに送信完了: {comment_text}")
+                    else:
+                        print(f"[DISPLAY] ❌ コメント表示用WebSocketサーバーが利用できません")
+                except Exception as e:
+                    print(f"[DISPLAY ERROR] コメント表示送信エラー: {e}")
+            elif "text" in data:  # 別の形式のコメントデータ
+                comment_text = data.get("text", "")
+                user_id = data.get("user_id", "")
+                print(f"[DISPLAY] コメント表示用WebSocketに送信（text形式）: {comment_text}")
+                try:
+                    # コメント表示用WebSocketサーバーに送信
+                    if self.comment_server:
+                        # 非同期で送信
+                        asyncio.create_task(self.comment_server.send_comment({
+                            "text": comment_text,
+                            "user_id": user_id,
+                            "timestamp": time.time()
+                        }))
+                        print(f"[DISPLAY] ✅ コメント表示用WebSocketに送信完了（text形式）: {comment_text}")
+                    else:
+                        print(f"[DISPLAY] ❌ コメント表示用WebSocketサーバーが利用できません")
+                except Exception as e:
+                    print(f"[DISPLAY ERROR] コメント表示送信エラー（text形式）: {e}")
             
             # 統計情報表示
             self._show_stats_if_needed(data)

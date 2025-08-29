@@ -1,132 +1,446 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ニコ生コメント表示</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Hachi+Maru+Pop&family=Klee+One&family=RocknRoll+One&family=New+Tegomin&family=Train+One&family=DotGothic16&family=Reggae+One&family=Yuji+Syuku&family=Yuji+Boku&family=Mochiy+Pop+One&family=Kaisei+HarunoUmi&family=Shippori+Antique&family=Stick&family=Rampart+One&family=Zen+Antique&family=Mochiy+Pop+P+One&family=Zen+Kurenaido&family=Yusei+Magic&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Hachi+Maru+Pop&family=Klee+One&family=RocknRoll+One&family=New+Tegomin&family=Train+One&family=DotGothic16&family=Reggae+One&family=Yuji+Syuku&family=Yuji+Boku&family=Mochiy+Pop+One&family=Kaisei+HarunoUmi&family=Shippori+Antique&family=Stick&family=Rampart+One&family=Zen+Antique&family=Mochiy+Pop+P+One&family=Zen+Kurenaido&family=Yusei+Magic&display=swap"
+      rel="stylesheet"
+      onerror="console.error('Google Fonts読み込み失敗、フォールバックフォントを使用');"
+    />
+
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: transparent;
-            overflow: hidden;
-            font-family: 'DotGothic16', sans-serif;
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        overflow: hidden;
+        font-family: "DotGothic16", sans-serif;
+      }
+
+      #comment-container {
+        position: relative;
+        width: 512px;
+        height: 100vh;
+        margin: 0 auto;
+      }
+
+      .comment-item {
+        position: absolute;
+        width: 512px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding-left: 10px;
+        transition: all 0.3s ease-out;
+        opacity: 0;
+        transform: translateX(100%);
+      }
+
+      .comment-item.show {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      /* コメントを確実に表示状態に保つ */
+      .comment-item.visible {
+        opacity: 1 !important;
+        transform: translateX(0) !important;
+        display: flex !important;
+      }
+
+      .comment-item.moving-up {
+        transition: all 0.2s ease-out;
+      }
+
+      .comment-text {
+        color: #ffffff;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        font-weight: bold;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 480px;
+        flex: 1;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* フォント定義（フォールバック付き） */
+      .font-0 {
+        font-family: "DotGothic16", "MS Gothic", monospace, sans-serif;
+      } /* デフォルト */
+      .font-1 {
+        font-family: "Dela Gothic One", "MS Gothic", cursive, sans-serif;
+      }
+      .font-2 {
+        font-family: "Hachi Maru Pop", "MS Gothic", cursive, sans-serif;
+      }
+      .font-3 {
+        font-family: "Klee One", "MS Mincho", cursive, serif;
+      }
+      .font-4 {
+        font-family: "RocknRoll One", "MS Gothic", cursive, sans-serif;
+      }
+      .font-5 {
+        font-family: "New Tegomin", "MS Mincho", serif, sans-serif;
+      }
+      .font-6 {
+        font-family: "Train One", "MS Gothic", cursive, sans-serif;
+      }
+      .font-7 {
+        font-family: "DotGothic16", "MS Gothic", monospace, sans-serif;
+      }
+      .font-8 {
+        font-family: "Reggae One", "MS Gothic", cursive, sans-serif;
+      }
+      .font-9 {
+        font-family: "Yuji Syuku", "MS Mincho", serif, sans-serif;
+      }
+      .font-10 {
+        font-family: "Yuji Boku", "MS Mincho", serif, sans-serif;
+      }
+      .font-11 {
+        font-family: "Mochiy Pop One", "MS Gothic", sans-serif;
+      }
+      .font-12 {
+        font-family: "Kaisei HarunoUmi", "MS Mincho", serif, sans-serif;
+      }
+      .font-13 {
+        font-family: "Shippori Antique", "MS Mincho", serif, sans-serif;
+      }
+      .font-14 {
+        font-family: "Stick", "MS Gothic", sans-serif;
+      }
+      .font-15 {
+        font-family: "Rampart One", "MS Gothic", cursive, sans-serif;
+      }
+      .font-16 {
+        font-family: "Zen Antique", "MS Mincho", serif, sans-serif;
+      }
+      .font-17 {
+        font-family: "Mochiy Pop P One", "MS Gothic", sans-serif;
+      }
+      .font-18 {
+        font-family: "Zen Kurenaido", "MS Gothic", sans-serif;
+      }
+      .font-19 {
+        font-family: "Yusei Magic", "MS Gothic", sans-serif;
+      }
+
+      /* スキン背景 */
+      .skin-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: contain;
+        background-position: left center;
+        background-repeat: no-repeat;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      /* アニメーション用キーフレーム */
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
         }
-        
-        #comment-container {
-            position: relative;
-            width: 512px;
-            height: 100vh;
-            margin: 0 auto;
+        to {
+          transform: translateX(0);
+          opacity: 1;
         }
-        
-        .comment-item {
-            position: absolute;
-            width: 512px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease-out;
-            opacity: 0;
-            transform: translateX(100%);
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(0);
         }
-        
-        .comment-item.show {
-            opacity: 1;
-            transform: translateX(0);
+        to {
+          transform: translateY(-32px);
         }
-        
-        .comment-item.moving-up {
-            transition: all 0.2s ease-out;
-        }
-        
-        .comment-text {
-            color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-            font-weight: bold;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 480px;
-        }
-        
-        /* フォント定義 */
-        .font-0 { font-family: 'DotGothic16', sans-serif; } /* デフォルト */
-        .font-1 { font-family: 'Dela Gothic One', cursive; }
-        .font-2 { font-family: 'Hachi Maru Pop', cursive; }
-        .font-3 { font-family: 'Klee One', cursive; }
-        .font-4 { font-family: 'RocknRoll One', cursive; }
-        .font-5 { font-family: 'New Tegomin', serif; }
-        .font-6 { font-family: 'Train One', cursive; }
-        .font-7 { font-family: 'DotGothic16', sans-serif; }
-        .font-8 { font-family: 'Reggae One', cursive; }
-        .font-9 { font-family: 'Yuji Syuku', serif; }
-        .font-10 { font-family: 'Yuji Boku', serif; }
-        .font-11 { font-family: 'Mochiy Pop One', sans-serif; }
-        .font-12 { font-family: 'Kaisei HarunoUmi', serif; }
-        .font-13 { font-family: 'Shippori Antique', serif; }
-        .font-14 { font-family: 'Stick', sans-serif; }
-        .font-15 { font-family: 'Rampart One', cursive; }
-        .font-16 { font-family: 'Zen Antique', serif; }
-        .font-17 { font-family: 'Mochiy Pop P One', sans-serif; }
-        .font-18 { font-family: 'Zen Kurenaido', sans-serif; }
-        .font-19 { font-family: 'Yusei Magic', sans-serif; }
-        
-        /* スキン背景 */
-        .skin-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-        
-        /* アニメーション用キーフレーム */
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        @keyframes slideUp {
-            from {
-                transform: translateY(0);
-            }
-            to {
-                transform: translateY(-32px);
-            }
-        }
-        
-        .slide-in {
-            animation: slideIn 0.5s ease-out forwards;
-        }
-        
-        .slide-up {
-            animation: slideUp 0.2s ease-out forwards;
-        }
+      }
+
+      .slide-in {
+        animation: slideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      }
+
+      .slide-up {
+        animation: slideUp 0.2s ease-out forwards;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div id="comment-container">
-        <!-- コメントがここに動的に追加される -->
+      <!-- コメントがここに動的に追加される -->
     </div>
-    
-    <script src="comment_display.js"></script>
-</body>
+
+    <script>
+      // フォント読み込み状況を確認
+      document.fonts.ready.then(() => {
+        console.log("🎨 全フォント読み込み完了");
+        document.fonts.forEach((font) => {
+          console.log(
+            `✅ 読み込み済みフォント: ${font.family} ${font.style} ${font.weight}`
+          );
+        });
+      });
+
+      // フォント読み込み失敗時の処理
+      document.fonts.addEventListener("loadingerror", (event) => {
+        console.error("❌ フォント読み込みエラー:", event);
+      });
+    </script>
+    <script>
+      class CommentDisplay {
+        constructor() {
+          this.container = document.getElementById("comment-container");
+          this.comments = [];
+          this.maxComments = 20; // 最大表示コメント数
+          this.autoScrollTimer = null;
+          this.autoScrollInterval = 60000; // 60秒（1分）
+
+          this.init();
+        }
+
+        init() {
+          this.connectWebSocket();
+          this.startAutoScroll();
+          this.loadSkinImages();
+        }
+
+        // WebSocket接続
+        connectWebSocket() {
+          try {
+            this.ws = new WebSocket("ws://localhost:8080/ws");
+
+            this.ws.onopen = () => {
+              console.log("WebSocket接続完了");
+            };
+
+            this.ws.onmessage = (event) => {
+              try {
+                const data = JSON.parse(event.data);
+                if (data.type === "comment") {
+                  this.addComment(data);
+                }
+              } catch (e) {
+                console.error("WebSocketデータ解析エラー:", e);
+              }
+            };
+
+            this.ws.onerror = (error) => {
+              console.error("WebSocketエラー:", error);
+            };
+
+            this.ws.onclose = () => {
+              console.log("WebSocket接続終了");
+              // 再接続を試行
+              setTimeout(() => this.connectWebSocket(), 5000);
+            };
+          } catch (e) {
+            console.error("WebSocket接続エラー:", e);
+          }
+        }
+
+        // スキン画像読み込み
+        loadSkinImages() {
+          this.skinImages = {};
+          // スキン画像のプリロード（必要に応じて）
+          console.log("スキン画像読み込み完了");
+        }
+
+        // コメント追加
+        addComment(data) {
+          console.log("コメント追加:", data); // デバッグログ追加
+
+          const comment = {
+            id: Date.now() + Math.random(),
+            text: data.text || "",
+            skin: data.skin || null,
+            font: data.font || 0,
+            timestamp: Date.now(),
+          };
+
+          console.log("処理後のコメント:", comment); // デバッグログ追加
+
+          // コメントリストに追加
+          this.comments.push(comment);
+
+          // 最大表示数を超えたら古いコメントを削除
+          if (this.comments.length > this.maxComments) {
+            this.comments.shift();
+          }
+
+          // 既存コメントを上に移動
+          this.moveAllCommentsUp();
+
+          // 新しいコメントを表示
+          this.displayComment(comment);
+
+          // コメントリストを更新
+          this.updateCommentPositions();
+        }
+
+        // コメント表示
+        displayComment(comment) {
+          console.log("スキン・フォント適用詳細:", {
+            skin: comment.skin,
+            font: comment.font,
+            text: comment.text,
+          });
+
+          const commentElement = document.createElement("div");
+          commentElement.className = "comment-item";
+          commentElement.id = `comment-${comment.id}`;
+          commentElement.style.bottom = "0px";
+
+                  // スキン背景設定
+        console.log(`🎨 スキン処理開始 - comment.skin: ${comment.skin} (型: ${typeof comment.skin})`);
+        
+        let skinPath;
+        if (comment.skin && comment.skin !== null && comment.skin !== "null") {
+          skinPath = `/skin/${comment.skin}.png`;
+          console.log(`🖼️ カスタムスキン使用: ${skinPath}`);
+        } else {
+          skinPath = `/skin/6.png`;
+          console.log(`🖼️ デフォルトスキン使用: ${skinPath}`);
+        }
+
+        const skinBg = document.createElement("div");
+        skinBg.className = "skin-bg";
+        skinBg.style.backgroundImage = `url('${skinPath}')`;
+        skinBg.style.border = "2px solid red"; // デバッグ用：スキン領域を可視化
+        
+        console.log(`🎯 スキン要素作成完了 - backgroundImage: ${skinBg.style.backgroundImage}`);
+
+        // スキン読み込み確認
+        const testImg = new Image();
+        testImg.onload = () => {
+          console.log(`✅ スキン読み込み成功: ${skinPath}`);
+          // デバッグ用の枠線を削除
+          skinBg.style.border = "none";
+        };
+        testImg.onerror = () => {
+          console.error(`❌ スキン読み込み失敗: ${skinPath}`);
+          // フォールバックスキンを試行
+          skinBg.style.backgroundImage = `url('/skin/6.png')`;
+          skinBg.style.border = "2px solid yellow"; // フォールバック時は黄色
+        };
+        testImg.src = skinPath;
+
+        commentElement.appendChild(skinBg);
+        console.log(`📦 スキン要素をコメントに追加完了`);
+
+          // コメントテキスト
+          const fontClass = `font-${comment.font || 0}`;
+          const textElement = document.createElement("div");
+          textElement.className = `comment-text ${fontClass}`;
+          textElement.textContent = comment.text;
+          console.log(`フォントクラス適用: ${fontClass}`);
+
+          // フォント適用確認
+          const computedStyle = window.getComputedStyle(textElement);
+          console.log(`実際のフォント: ${computedStyle.fontFamily}`);
+
+          commentElement.appendChild(textElement);
+
+          // コンテナに追加
+          this.container.appendChild(commentElement);
+
+          // アニメーション開始（右から左に飛び込む）
+          requestAnimationFrame(() => {
+            commentElement.classList.add("slide-in");
+            console.log("アニメーション開始:", comment.text);
+          });
+
+          // アニメーション完了後の処理（表示状態を維持）
+          setTimeout(() => {
+            commentElement.classList.remove("slide-in");
+            commentElement.classList.add("visible");
+            console.log("アニメーション完了、表示状態固定:", comment.text);
+          }, 800);
+        }
+
+        // 全コメントを上に移動
+        moveAllCommentsUp() {
+          const commentElements = document.querySelectorAll(".comment-item");
+          commentElements.forEach((element) => {
+            element.classList.add("moving-up");
+            const currentBottom = parseFloat(element.style.bottom) || 0;
+            element.style.bottom = currentBottom + 32 + "px";
+          });
+        }
+
+        // コメント位置を更新
+        updateCommentPositions() {
+          // 画面外に出たコメントを削除
+          const commentElements = document.querySelectorAll(".comment-item");
+          commentElements.forEach((element) => {
+            const bottom = parseFloat(element.style.bottom) || 0;
+            if (bottom > window.innerHeight) {
+              element.remove();
+            }
+          });
+        }
+
+        // 自動スクロール開始（とりあえず無効化）
+        startAutoScroll() {
+          // 自動スクロールを一時的に無効化してテスト
+          console.log("自動スクロールは無効化されています");
+          // this.autoScrollTimer = setInterval(() => {
+          //   this.moveAllCommentsUp();
+          //   this.updateCommentPositions();
+          // }, this.autoScrollInterval);
+        }
+
+        // 自動スクロール停止
+        stopAutoScroll() {
+          if (this.autoScrollTimer) {
+            clearInterval(this.autoScrollTimer);
+            this.autoScrollTimer = null;
+          }
+        }
+
+        // クリーンアップ
+        destroy() {
+          this.stopAutoScroll();
+          if (this.ws) {
+            this.ws.close();
+          }
+        }
+      }
+
+      // ページ読み込み完了後に初期化
+      document.addEventListener("DOMContentLoaded", () => {
+        window.commentDisplay = new CommentDisplay();
+      });
+
+      // ページ離脱時のクリーンアップ
+      window.addEventListener("beforeunload", () => {
+        if (window.commentDisplay) {
+          window.commentDisplay.destroy();
+        }
+      });
+
+      // エラーハンドリング
+      window.addEventListener("error", (event) => {
+        console.error("JavaScriptエラー:", event.error);
+      });
+
+      // 未処理のPromise拒否
+      window.addEventListener("unhandledrejection", (event) => {
+        console.error("未処理のPromise拒否:", event.reason);
+      });
+    </script>
+  </body>
 </html>

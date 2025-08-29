@@ -12,6 +12,7 @@ import os
 import re
 import requests
 import xml.etree.ElementTree as ET
+import asyncio
 
 def get_user_type(user_id: str) -> str:
     print(f"[USER_TYPE] ユーザーID: '{user_id}' -> ", end="")
@@ -443,16 +444,14 @@ class CommentProcessor:
 
     def _handle_normal_comment(self, user_id: str, mail: str, parsed: Dict[str, Any]) -> bool:
         """通常コメントを処理"""
-        text_body = parsed["text"]
+        original_text = parsed["text"]  # 表示用は元のテキストを使用
         
-        # 置換処理を追加
-        original_text = text_body
-        text_body = self.word_replacer.replace_text(text_body)
-        if original_text != text_body:
-            print(f"[REPLACE] '{original_text}' → '{text_body}'")
-
-        # 文字変換処理を追加
-        text_body = self.text_converter.convert_text(text_body)
+        # 音声合成用のテキスト処理
+        voice_text = original_text
+        voice_text = self.word_replacer.replace_text(voice_text)
+        if original_text != voice_text:
+            print(f"[REPLACE] '{original_text}' → '{voice_text}'")
+        voice_text = self.text_converter.convert_text(voice_text)
         
         # 生IDの場合はユーザー情報を自動取得・保存
         print(f"[DEBUG] ユーザーID: '{user_id}', isdigit: {user_id.isdigit()}")
@@ -479,11 +478,31 @@ class CommentProcessor:
         print(f"🎵 最終設定: {settings_info}")
         
         # 読み上げ対象外チェック
-        if self._should_skip_voice(mail, text_body):
+        if self._should_skip_voice(mail, voice_text):
             return False
         
-        # 音声合成キューに追加
-        self.queue_manager.add_to_synthesis_queue(text_body, final_settings["voice"])
+        # 音声合成キューに追加（変換後のテキストを使用）
+        self.queue_manager.add_to_synthesis_queue(voice_text, final_settings["voice"])
+        
+        # コメント表示用WebSocketに送信（元のテキストを使用）
+        try:
+            from gui.comment_websocket_server import get_comment_server
+            comment_server = get_comment_server()
+            if comment_server:
+                # 非同期で送信（スキンとフォント情報を含む）
+                comment_data = {
+                    "text": original_text,  # 表示用は元のテキスト
+                    "user_id": user_id,
+                    "skin": final_settings.get("skin") or 6,  # デフォルトスキン6を適用
+                    "font": final_settings.get("font", 0),
+                    "timestamp": time.time()
+                }
+                asyncio.create_task(comment_server.send_comment(comment_data))
+                print(f"[DISPLAY] ✅ コメント表示用WebSocketに送信完了: {original_text} (skin={final_settings.get('skin')}, font={final_settings.get('font', 0)})")
+            else:
+                print(f"[DISPLAY] ❌ コメント表示用WebSocketサーバーが利用できません")
+        except Exception as e:
+            print(f"[DISPLAY ERROR] コメント表示送信エラー: {e}")
         
         return True
         

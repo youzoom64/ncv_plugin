@@ -201,7 +201,7 @@ class CommentViewerGUI:
         self.sound_file_labels = {}
 
         # 設定可能なコマンド
-        commands = ["info 10", "gift", "ad", "connect", "disconnect", "premium", "special"]
+        commands = ["info 10", "gift", "ad"]
 
         for i, cmd in enumerate(commands):
             # コマンド名ラベル

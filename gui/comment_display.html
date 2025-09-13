@@ -226,8 +226,8 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-size: contain;
-        background-position: left center;
+        background-size: cover;
+        background-position: center;
         background-repeat: no-repeat;
         z-index: 1;
         pointer-events: none;
@@ -411,7 +411,6 @@
           const skinBg = document.createElement("div");
           skinBg.className = "skin-bg";
           skinBg.style.backgroundImage = `url('${skinPath}')`;
-          skinBg.style.border = "2px solid red"; // デバッグ用：スキン領域を可視化
 
           console.log(
             `🎯 スキン要素作成完了 - backgroundImage: ${skinBg.style.backgroundImage}`
@@ -421,14 +420,11 @@
           const testImg = new Image();
           testImg.onload = () => {
             console.log(`✅ スキン読み込み成功: ${skinPath}`);
-            // デバッグ用の枠線を削除
-            skinBg.style.border = "none";
           };
           testImg.onerror = () => {
             console.error(`❌ スキン読み込み失敗: ${skinPath}`);
             // フォールバックスキンを試行
             skinBg.style.backgroundImage = `url('http://localhost:8080/skin/6.png')`;
-            skinBg.style.border = "2px solid yellow"; // フォールバック時は黄色
           };
           testImg.src = skinPath;
 

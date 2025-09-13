@@ -1,12 +1,12 @@
 {
-  "sound_enabled": true,
   "operator_voice_id": 102,
   "sound_alias": {
     "nicoad": "ad"
   },
   "sound_files": {
     "gift": "Sound/gift.wav",
-    "ad": "Sound/koukoku.wav"
+    "ad": "Sound/koukoku.wav",
+    "info 10": "Sound/doarbell.wav"
   },
   "templates": {
     "gift": "{name}さんが{point}ポイント{gift}をギフトしました",

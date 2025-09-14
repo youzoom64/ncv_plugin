@@ -492,9 +492,9 @@ class CommentProcessor:
         if self._should_skip_voice(mail, voice_text):
             return False
         
-        # 音声合成の処理時間を測定
+        # 運営コメントと同じ処理方式：即座に音声合成して再生キューに追加
         voice_id = final_settings["voice"]
-        print(f"[VOICE] 🔄 音声合成開始: '{voice_text}' (voice:{voice_id})")
+        print(f"[VOICE] 🔄 即座音声合成開始: '{voice_text}' (voice:{voice_id})")
         
         import time
         start_time = time.time()

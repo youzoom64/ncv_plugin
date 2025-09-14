@@ -266,9 +266,17 @@ class CommentProcessor:
     def _queue_combined_audio(self, command_type: str, text: str, settings: dict, user_id: str):
         """効果音+音声を合成してキューに追加"""
         try:
-            # 1. 音声合成
+            # 1. 音声合成（処理時間測定）
             voice_id = self._get_user_voice_id(user_id)
+            print(f"[OPERATOR] 🔄 運営音声合成開始: '{text}' (voice:{voice_id})")
+            
+            import time
+            start_time = time.time()
             voice_data = self.voice_controller.synthesize_only(text, voice_id, 1.0)
+            
+            end_time = time.time()
+            synthesis_time = end_time - start_time
+            print(f"[OPERATOR] ⏱️ 運営音声合成時間: {synthesis_time:.2f}秒")
             
             # 2. 効果音取得
             sound_data = self._get_sound_data(command_type, settings)
@@ -484,24 +492,34 @@ class CommentProcessor:
         if self._should_skip_voice(mail, voice_text):
             return False
         
-        # 即座に音声合成して再生キューに追加（運営コメントと同じ処理方式）
+        # 音声合成の処理時間を測定
+        voice_id = final_settings["voice"]
+        print(f"[VOICE] 🔄 音声合成開始: '{voice_text}' (voice:{voice_id})")
+        
+        import time
+        start_time = time.time()
+        
         try:
-            voice_id = final_settings["voice"]
-            print(f"[VOICE] 🔄 即座音声合成開始: '{voice_text}' (voice:{voice_id})")
-            
-            # 音声合成を即座に実行
+            # 音声合成を即座に実行（運営コメントと同じ処理方式）
             voice_data = self.voice_controller.synthesize_only(voice_text, voice_id, 1.0)
+            
+            end_time = time.time()
+            synthesis_time = end_time - start_time
+            print(f"[VOICE] ⏱️ 音声合成時間: {synthesis_time:.2f}秒")
+            
             if voice_data:
                 # 合成完了したら再生キューに直接追加
                 self.queue_manager.add_to_playback_queue(voice_text, voice_data)
-                print(f"[VOICE] ✅ 即座音声合成完了: '{voice_text}' → 再生キューに追加")
+                print(f"[VOICE] ✅ 音声合成完了: '{voice_text}' → 再生キューに追加")
             else:
-                print(f"[VOICE] ❌ 即座音声合成失敗: '{voice_text}'")
+                print(f"[VOICE] ❌ 音声合成失敗: '{voice_text}'")
                 
         except Exception as e:
-            print(f"[VOICE ERROR] 即座音声合成エラー: {e}")
+            end_time = time.time()
+            synthesis_time = end_time - start_time
+            print(f"[VOICE ERROR] 音声合成エラー: {e} (処理時間: {synthesis_time:.2f}秒)")
             # エラー時は従来のキュー方式にフォールバック
-            self.queue_manager.add_to_synthesis_queue(voice_text, final_settings["voice"])
+            self.queue_manager.add_to_synthesis_queue(voice_text, voice_id)
         
         # コメント表示用WebSocketに送信（元のテキストを使用）
         try:

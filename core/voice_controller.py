@@ -10,11 +10,23 @@ from typing import Optional
 VOICEVOX_URL = "http://localhost:50021"
 
 class VoiceController:
+    _instance = None
+    _initialized = False
+    
+    def __new__(cls, base_url=VOICEVOX_URL):
+        if cls._instance is None:
+            cls._instance = super(VoiceController, cls).__new__(cls)
+        return cls._instance
+    
     def __init__(self, base_url=VOICEVOX_URL):
+        if self._initialized:
+            return
+            
         self.base_url = base_url
         self.is_voicevox_available = False
         self.speakers_info = {}  # スピーカー情報を保存
-        print("[INIT] VoiceController initialized")
+        print("[INIT] VoiceController initialized (シングルトン)")
+        self._initialized = True
         
         # pygameの音声モジュールを初期化
         try:

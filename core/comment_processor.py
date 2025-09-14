@@ -484,8 +484,24 @@ class CommentProcessor:
         if self._should_skip_voice(mail, voice_text):
             return False
         
-        # 音声合成キューに追加（変換後のテキストを使用）
-        self.queue_manager.add_to_synthesis_queue(voice_text, final_settings["voice"])
+        # 即座に音声合成して再生キューに追加（運営コメントと同じ処理方式）
+        try:
+            voice_id = final_settings["voice"]
+            print(f"[VOICE] 🔄 即座音声合成開始: '{voice_text}' (voice:{voice_id})")
+            
+            # 音声合成を即座に実行
+            voice_data = self.voice_controller.synthesize_only(voice_text, voice_id, 1.0)
+            if voice_data:
+                # 合成完了したら再生キューに直接追加
+                self.queue_manager.add_to_playback_queue(voice_text, voice_data)
+                print(f"[VOICE] ✅ 即座音声合成完了: '{voice_text}' → 再生キューに追加")
+            else:
+                print(f"[VOICE] ❌ 即座音声合成失敗: '{voice_text}'")
+                
+        except Exception as e:
+            print(f"[VOICE ERROR] 即座音声合成エラー: {e}")
+            # エラー時は従来のキュー方式にフォールバック
+            self.queue_manager.add_to_synthesis_queue(voice_text, final_settings["voice"])
         
         # コメント表示用WebSocketに送信（元のテキストを使用）
         try:
